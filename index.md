@@ -14,8 +14,9 @@
         </div>
         <br>
         <div align="center">
-            <a href="">Instagram  </a>
-            <a href="">Twitter</a>
+            <a href="https://www.instagram.com/hasan.aliozdemirr/">Instagram  </a>
+            <br>
+            <a href="https://twitter.com/senisage">Twitter</a>
             
             <h1>🥺</h1>
             <h1>👉👈</h1>
