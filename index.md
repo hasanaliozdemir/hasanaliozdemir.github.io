@@ -5,7 +5,21 @@
     </head>
     <body>
         <div align="center">
-            <p>STALKER UZAK DUR</p>
+            <h1>STALKER UZAK DUR !!</h1>
+            <br>
+            <h3>Şaka şaka </h3>
+            <br>
+            <h3>✨✨ Hoş geldin ✨✨</h3>
+            <h3>Seni bekliyordum 🥺 🥺</h3>
+        </div>
+        <br>
+        <div align="center">
+            <a href="">Instagram  </a>
+            <a href="">Twitter</a>
+            
+            <h1>🥺</h1>
+            <h1>👉👈</h1>
+            <h3>Devamını bekliyorum...  </h3>
         </div>
     </body>
 </html>
