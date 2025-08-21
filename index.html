@@ -1,195 +1,81 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>QR Code Generator</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>30mm x 30mm QR Kodu – bektastekstil.com.tr/tr/</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    .controls {
-      margin-bottom: 20px;
-    }
-    .qr-container {
-      display: grid;
-      gap: 10px;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    }
-    .qr-card {
-      border: 1px solid #ccc;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      width: 3.5cm;
-      height: 3.5cm;
-    }
-    .qr-card h3 {
-      margin: 5px 0;
-      font-size: 14px;
-      text-align: center;
-    }
-    .qr-card p {
-      margin: 0;
-      font-size: 12px;
-      text-align: center;
-    }
-    @media print {
-      body * {
-        visibility: hidden;
-      }
-      .print-area, .print-area * {
-        visibility: visible;
-      }
-      .print-area {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        page-break-inside: avoid;
-      }
-    }
-      .label-controls { margin-top: 8px; }
-    .hidden { display:none; }
-</style>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.min.js"></script>
+    :root { --card-bg: #fff; --ink: #111; --muted: #555; --accent: #1f6feb; --border: #e5e7eb; }
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, Noto Sans, "Apple Color Emoji", "Segoe UI Emoji"; color: var(--ink); background: #f6f8fa; margin: 0; }
+    .wrap { max-width: 880px; margin: 40px auto; padding: 0 16px; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+    h1 { font-size: 20px; margin: 0 0 8px; }
+    p.lead { margin: 0 0 16px; color: var(--muted); }
+    .row { display: grid; grid-template-columns: 1fr; gap: 16px; align-items: start; }
+    @media (min-width: 720px) { .row { grid-template-columns: 320px 1fr; } }
+
+    .qr-preview { display: grid; place-items: center; border: 1px dashed var(--border); background: #fafbfc; border-radius: 12px; padding: 18px; }
+    .mm-box { width: 30mm; height: 30mm; display: grid; place-items: center; background: #fff; border: 1px solid #d1d5db; border-radius: 8px; }
+    .mm-box canvas { width: 100%; height: 100%; image-rendering: pixelated; }
+    .meta { font-size: 12px; color: var(--muted); margin-top: 8px; text-align: center; }
+
+    .controls { display: flex; flex-wrap: wrap; gap: 10px; }
+    .btn { appearance: none; border: 1px solid var(--border); background: #fff; color: var(--ink); padding: 10px 14px; border-radius: 999px; cursor: pointer; font-weight: 600; transition: transform .04s ease, box-shadow .2s ease; }
+    .btn:hover { box-shadow: 0 4px 10px rgba(0,0,0,.08); }
+    .btn:active { transform: translateY(1px); }
+    .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    .field { display: grid; gap: 6px; }
+    .field input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; }
+    .chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 999px; font-size: 12px; color: var(--muted); }
+    .chip code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size: 12px; color: #111; }
+    footer { margin-top: 20px; font-size: 12px; color: var(--muted); text-align: center; }
+  </style>
 </head>
 <body>
-  <h1>QR Code Generator</h1>
+  <div class="wrap">
+    <div class="card">
+      <h1>30mm x 30mm QR Kodu</h1>
+      <p class="lead">Aşağıdaki adres için tek sayfalık QR oluşturucu. Önizleme kutusu gerçek <strong>30×30&nbsp;mm</strong> boyutundadır (yazdırırken de bu ölçüyle çıkar). İndirme seçenekleri: PNG, JPG/JPEG ve PDF.</p>
 
-  <div class="controls">
-    <label>Title: <input type="text" id="qr-title" /></label><br /><br />
-    <label>Description: <input type="text" id="qr-description" /></label><br /><br />
-    <label>Enter text for QR: <input type="text" id="qr-input" /></label><br /><br />
-    <label>How many QR codes on paper (1-20):</label><br />
-    <div id="qr-count-options"></div>
-    <br />
-    <button onclick="generateQR()">Generate QR</button>
-    <button onclick="window.print()">Normal Yazdır</button>
-    <button onclick="printCab()">CAB EOS 5 Yazdır</button>
-    <button onclick="printArgox()">Argox OS-214plus Yazdır</button>
-    <button onclick="printBartender()">Bartender ile Yazdır</button>
+      <div class="row">
+        <div class="qr-preview">
+          <div class="mm-box" aria-label="30mm x 30mm QR önizleme alanı">
+            <div id="qrcell"></div>
+          </div>
+          <div class="meta">Önizleme: 30mm × 30mm • Yüksek çözünürlüklü içerik</div>
+        </div>
 
-    <div class="label-controls">
-      <hr style="margin:16px 0;"/>
-      <strong>35×35 mm Etiket Yazdır (doğrudan barkod yazıcıya):</strong><br/>
-      <label>Kopya Sayısı: <input type="number" id="label-copies" value="1" min="1" max="999" style="width:80px"></label>
-      <button onclick="printLabel35mm()">35×35 mm Etiket Yazdır</button>
-      <div style="font-size:12px;opacity:0.8;margin-top:6px">Yazdırma penceresinde ölçek %100, kenar boşluğu 0 olmalı. Tarayıcı başlık/altbilgi kapalı olmalı.</div>
+        <div class="tools">
+          <div class="field">
+            <label for="url">Adres</label>
+            <input id="url" value="https://bektastekstil.com.tr/tr/" readonly />
+          </div>
+          <div style="height:8px"></div>
+          <div class="controls">
+            <button class="btn primary" id="btn-regenerate" title="QR kodunu yeniden üret">QR'ı Yenile</button>
+            <button class="btn" id="btn-png">PNG indir</button>
+            <button class="btn" id="btn-jpg">JPG indir</button>
+            <button class="btn" id="btn-jpeg">JPEG indir</button>
+            <button class="btn" id="btn-pdf">PDF indir (30mm×30mm)</button>
+          </div>
+          <div style="margin-top:12px">
+            <span class="chip">Boyut: <code>30mm × 30mm</code></span>
+            <span class="chip">Hata Düzeyi: <code>M</code></span>
+            <span class="chip">Kenar boşluğu: <code>4</code></span>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        Not: PNG/JPG dosyaları piksel cinsindendir (ekranda kullanıma uygundur). <strong>PDF</strong> çıktısı <strong>tam 30mm × 30mm</strong> sayfa boyutundadır (baskı için idealdir).
+      </footer>
     </div>
   </div>
-    <br />
-    <button onclick="generateQR()">Generate QR</button>
-    <button onclick="window.print()">Normal Yazdır</button>
-    <button onclick="printCab()">CAB EOS 5 Yazdır</button>
-    <button onclick="printArgox()">Argox OS-214plus Yazdır</button>
-    <button onclick="printBartender()">Bartender ile Yazdır</button>
-  </div>
 
-  <div id="qr-output" class="qr-container print-area"></div>
-
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.min.js"></script>
-<script>
-  const qrCountOptions = document.getElementById('qr-count-options');
-  for (let i = 1; i <= 20; i++) {
-    const label = document.createElement('label');
-    label.innerHTML = `<input type="radio" name="qr-count" value="${i}" ${i === 1 ? 'checked' : ''}/> ${i}`;
-    label.style.marginRight = '8px';
-    qrCountOptions.appendChild(label);
-  }
-
-  function generateQR() {
-    const container = document.getElementById('qr-output');
-    container.innerHTML = '';
-
-    const text = document.getElementById('qr-input').value;
-    const title = document.getElementById('qr-title').value;
-    const description = document.getElementById('qr-description').value;
-    const count = parseInt(document.querySelector('input[name="qr-count"]:checked').value);
-
-    for (let i = 0; i < count; i++) {
-      const card = document.createElement('div');
-      card.classList.add('qr-card');
-
-      const canvas = document.createElement('canvas');
-      QRCode.toCanvas(canvas, text, { width: 180, margin: 1 }, function (error) {
-        if (error) console.error(error);
-      });
-
-      const titleEl = document.createElement('h3');
-      titleEl.textContent = title;
-
-      const descEl = document.createElement('p');
-      descEl.textContent = description;
-
-      card.appendChild(canvas);
-      if (title) card.appendChild(titleEl);
-      if (description) card.appendChild(descEl);
-
-      container.appendChild(card);
-    }
-  }
-
-  function printCab() {
-    const text = document.getElementById('qr-input').value;
-    alert("CAB EOS 5 yazıcıya gönderilecek komut: (örnek)
-— Cablabel/JS ile gerçek gönderim için backend gerekir.");
-  }
-
-  function printArgox() {
-    const text = document.getElementById('qr-input').value;
-    alert("Argox OS-214plus yazıcıya gönderilecek komut: (örnek)
-— Gerçek gönderim için backend gerekir.");
-  }
-
-  function printBartender() {
-    const text = document.getElementById('qr-input').value;
-    fetch('/print-bartender', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: text })
-    }).then(()=>alert('Bartender yazdırma isteği gönderildi (backend gerekli).'))
-      .catch(err => alert('Hata: ' + err));
-  }
-
-  // --- 35×35 mm LABEL PRINT (no backend) ---
-  function openLabelWindow(html) {
-    const w = window.open('', '_blank');
-    w.document.open();
-    w.document.write(html);
-    w.document.close();
-  }
-
-  function printLabel35mm() {
-    const text = document.getElementById('qr-input').value || '';
-    const copies = Math.max(1, Math.min(999, parseInt(document.getElementById('label-copies').value || '1')));
-
-    // Create one QR (high res) then reuse as image
-    const canvas = document.createElement('canvas');
-    // 35mm ≈ 1.378 in; @300dpi ≈ 413px. Biraz yüksek tutalım.
-    const px = 420;
-    return QRCode.toCanvas(canvas, text, { width: px, margin: 0 }, function () {
-      const dataUrl = canvas.toDataURL('image/png');
-      const labelHTML = `<!DOCTYPE html>
-<html><head><meta charset="utf-8"/>
-<style>
-  @page { size: 35mm 35mm; margin: 0; }
-  html, body { margin:0; padding:0; }
-  .label { width:35mm; height:35mm; page-break-after: always; display:flex; align-items:center; justify-content:center; }
-  img { width:35mm; height:35mm; display:block; }
-</style>
-</head>
-<body>
-  ${Array.from({length: copies}).map(()=>`<div class="label"><img src='${dataUrl}' alt='QR'/></div>`).join('')}
-  <script>window.onload = function(){ window.focus(); window.print(); }</script>
-</body></html>`;
-      openLabelWindow(labelHTML);
-    });
-  }
-</script>
-</body>
-</html>
+  <!-- QRCode (davidshimjs) -->
+  <script>
+  /*! qrcode.js v1.0.0 (minified, inlined) – https://github.com/davidshimjs/qrcodejs */
+  /* eslint-disable */
+  !function(o){function r(t){this.mode=c.MODE_8BIT_BYTE,this.data=t,this.parsedData=[];for(var e=0,i=this.data.length;e<i;e++){var n=[],r=this.data.charCodeAt(e);128>r?n.push(r):2048>r?(n.push(192|(r>>6&31)),n.push(128|63&r)):55296===(64512&r)&&e+1<i&&56320===(64512&this.data.charCodeAt(e+1))?(r=65536+((1023&r)<<10)+(1023&this.data.charCodeAt(++e)),n.push(240|(r>>18&7)),n.push(128|r>>12&63),n.push(128|r>>6&63),n.push(128|63&r)):(n.push(224|r>>12&15),n.push(128|r>>6&63),n.push(128|63&r)),this.parsedData=this.parsedData.concat(n)}this.parsedData.length!=this.data.length&&(this.parsedData.unshift(191),this.parsedData.unshift(187),this.parsedData.unshift(239))}function t(t,e){this.typeNumber=t,this.errorCorrectLevel=e,this.modules=null,this.moduleCount=0,this.dataCache=null,this.dataList=[]}var c={};r.prototype={getLength:function(t){return this.parsedData.length},write:function(t){for(var e=0,i=this.parsedData.length;e<i;e++)t.put(this.parsedData[e],8)}};var n=0,e=1,i=2,a=3,s=4,h=5,d=6,u=7,l=8,f=9,g=10,p=11,m=12,v=13,w=14,y=15,k=16,b=17,x=18,C=19,S=20,E=21,L=22,A=23,T=24,D=25,I=26,N=27,O=28,P=29,q=30,B=31,H=32,R=
